@@ -211,6 +211,13 @@ export function SetupScreen() {
                 </button>
               ))}
             </div>
+            <label className="toggle">
+              <input type="checkbox" checked={s.distraction} onChange={s.toggleDistraction} />
+              <span className="switch" />
+              <span>
+                <b>😜 딴짓 모드</b> <small className="muted">일부 푸니가 발표자 대신 서로 쳐다보며 놀아요 (발표 중 D 키)</small>
+              </span>
+            </label>
           </div>
         </section>
 

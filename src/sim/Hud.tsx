@@ -32,7 +32,7 @@ function useElapsed(startedAt: number) {
 }
 
 export function Hud() {
-  const { slideIndex, slides, mode, paused, startedAt, exitToSetup, shuffleSeats } = useApp();
+  const { slideIndex, slides, mode, paused, startedAt, exitToSetup, shuffleSeats, distraction, toggleDistraction } = useApp();
   const elapsed = useElapsed(startedAt);
 
   return (
@@ -47,7 +47,10 @@ export function Hud() {
             '슬라이드 없음'
           )}
         </span>
-        <span className="chip">⏱ {elapsed}</span>
+        <span className="hud-right">
+          {distraction && <span className="chip mode">😜 딴짓 ON</span>}
+          <span className="chip">⏱ {elapsed}</span>
+        </span>
       </div>
 
       {!paused && (
@@ -71,6 +74,7 @@ export function Hud() {
               <li><kbd>좌클릭</kbd> 클리커 들기 → <kbd>휠</kbd> 이전 / 다음 슬라이드</li>
               <li><kbd>우클릭</kbd> 대본 들기 → <kbd>휠</kbd> 대본 스크롤</li>
               <li><kbd>→ / PageDown</kbd> <kbd>← / PageUp</kbd> 키보드·리모컨으로 넘기기</li>
+              <li><kbd>D</kbd> 딴짓 모드 켜기/끄기</li>
               <li><kbd>R</kbd> 시선 정면으로 · <kbd>Esc</kbd> 일시정지</li>
             </ul>
             <div className="row">
@@ -79,6 +83,9 @@ export function Hud() {
               </button>
               <button className="btn ghost" onClick={shuffleSeats}>
                 🎲 자리 섞기
+              </button>
+              <button className={`btn ${distraction ? 'active' : 'ghost'}`} onClick={toggleDistraction}>
+                😜 딴짓 {distraction ? 'ON' : 'OFF'}
               </button>
               <button className="btn primary" onClick={requestLock}>
                 {slideIndex === 0 ? '발표 시작 🎤' : '계속하기 ▶'}

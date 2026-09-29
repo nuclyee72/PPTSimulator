@@ -23,6 +23,7 @@ interface AppState {
   puniCount: number;
   puniImages: string[];
   seatSeed: number; // re-rolled on every entry so seats and characters are shuffled
+  distraction: boolean; // some Punis chat with each other instead of watching
 
   // Simulation
   slideIndex: number;
@@ -36,6 +37,7 @@ interface AppState {
   start: () => void;
   exitToSetup: () => void;
   shuffleSeats: () => void;
+  toggleDistraction: () => void;
   toggleMode: (mode: Exclude<HandMode, 'none'>) => void;
   step: (dir: 1 | -1) => void;
 }
@@ -51,6 +53,7 @@ export const useApp = create<AppState>((set, get) => ({
   puniCount: 20,
   puniImages: DEFAULT_PUNIS.length ? DEFAULT_PUNIS : [FALLBACK_PUNI],
   seatSeed: randomSeed(),
+  distraction: false,
 
   slideIndex: 0,
   mode: 'none',
@@ -63,6 +66,7 @@ export const useApp = create<AppState>((set, get) => ({
   start: () => set({ screen: 'sim', slideIndex: 0, mode: 'none', paused: true, startedAt: 0, seatSeed: randomSeed() }),
   exitToSetup: () => set({ screen: 'setup', paused: true }),
   shuffleSeats: () => set({ seatSeed: randomSeed() }),
+  toggleDistraction: () => set({ distraction: !get().distraction }),
   toggleMode: (mode) => set({ mode: get().mode === mode ? 'none' : mode }),
   step: (dir) => {
     const { slideIndex, slides } = get();

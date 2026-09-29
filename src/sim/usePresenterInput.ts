@@ -87,6 +87,9 @@ export function usePresenterInput(canvas: HTMLCanvasElement | null) {
         case 'KeyE':
           toggleMode('script');
           break;
+        case 'KeyD':
+          app().toggleDistraction();
+          break;
         case 'KeyR':
           look.yaw = 0;
           look.pitch = -0.08;
