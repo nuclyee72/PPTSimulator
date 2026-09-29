@@ -4,8 +4,8 @@ import type { Vec3 } from './Boxes';
 const CHATTY_SHARE = 0.3;
 /** Pairs only form between Punis within this distance (front/back neighbours count double). */
 const PAIR_RANGE = 1.6;
-/** Max head turn toward the partner; flat sprites turned further would go edge-on and vanish. */
-const MAX_TURN = 1.05;
+/** Max turn toward the partner; flat sprites look squashed when turned much further. */
+const MAX_TURN = 0.5;
 const FADE = 0.6; // seconds to turn toward / away from the partner
 
 export interface Pair {

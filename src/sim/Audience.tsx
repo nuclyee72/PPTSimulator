@@ -113,10 +113,13 @@ function PuniGroup({ sprite, people }: { sprite: PuniSprite; people: Person[] })
       const c = pp.chat;
       const w = c ? distraction.mix * chatWeight(c.pair, t) : 0;
       const giggle = w * Math.sin(t * 11 + pp.phase);
-      const squash = 1 + wobble * 0.025 - hop * 0.06 + giggle * 0.03;
+      const squash = 1 + wobble * 0.025 - hop * 0.06 + giggle * 0.015;
+      const turn = c ? c.turn * w : 0;
+      // A turned flat sprite looks narrower from the front; widen it back so it doesn't shrink.
+      const widen = 1 / Math.cos(turn);
       const roll = Math.sin(t * 0.7 + pp.phase) * 0.04 + (c ? -Math.sign(c.turn) * 0.26 * w + giggle * 0.06 : 0);
-      tmp.s.set(h * sprite.aspect * (2 - squash), h * squash, 1);
-      tmp.q.setFromEuler(tmp.e.set(0, pp.yaw + (c ? c.turn * w : 0), roll));
+      tmp.s.set(h * sprite.aspect * (2 - squash) * widen, h * squash, 1);
+      tmp.q.setFromEuler(tmp.e.set(0, pp.yaw + turn, roll));
       tmp.v.set(pp.p[0], pp.p[1] + hop * HOP_HEIGHT, pp.p[2]);
       if (c) {
         tmp.v.x += c.toward[0] * 0.09 * w;
