@@ -1,6 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import * as THREE from 'three';
+import { view } from '../../runtime';
 import { useApp } from '../../store';
 import { Box } from '../Boxes';
 import { toon } from '../toon';
@@ -10,6 +11,8 @@ const DOWN = new THREE.Vector3(0.24, -0.6, -0.35);
 const PRESS_MS = 180;
 const LED_ON = new THREE.Color('#fff0f3');
 const LED_OFF = new THREE.Color('#ff4d6d');
+const target = new THREE.Vector3();
+const down = new THREE.Vector3();
 
 /** Stick-shaped presentation remote held in the right hand. */
 export function Clicker() {
@@ -23,9 +26,10 @@ export function Clicker() {
     const { mode, lastClickAt } = useApp.getState();
     const active = mode === 'clicker';
     const k = 1 - Math.exp(-dt * 14);
-    const target = active ? UP : DOWN;
+    down.copy(DOWN).setX(DOWN.x * view.squeeze);
+    target.copy(active ? UP : DOWN).setX((active ? UP : DOWN).x * view.squeeze);
     g.position.lerp(target, k);
-    g.visible = g.position.distanceTo(DOWN) > 0.02;
+    g.visible = g.position.distanceTo(down) > 0.02;
 
     const since = performance.now() - lastClickAt;
     const press = active && since < PRESS_MS ? Math.sin((since / PRESS_MS) * Math.PI) : 0;

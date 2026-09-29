@@ -12,19 +12,19 @@ function placeholderSlide() {
   c.width = 1280;
   c.height = 720;
   const ctx = c.getContext('2d')!;
-  ctx.fillStyle = '#fff4f6';
+  ctx.fillStyle = '#f6efe4';
   ctx.fillRect(0, 0, c.width, c.height);
-  ctx.fillStyle = '#ffd6e0';
+  ctx.fillStyle = '#e2d3bd';
   for (let y = 40; y < c.height; y += 80) for (let x = (y / 80) % 2 ? 80 : 40; x < c.width; x += 160) {
     ctx.beginPath();
     ctx.arc(x, y, 10, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#3b2f3f';
+  ctx.fillStyle = '#3d3129';
   ctx.font = '96px Jua, "Malgun Gothic", sans-serif';
   ctx.fillText('발표 자료 없음', c.width / 2, c.height / 2);
-  ctx.fillStyle = '#9d8189';
+  ctx.fillStyle = '#857361';
   ctx.font = '40px "Gowun Dodum", "Malgun Gothic", sans-serif';
   ctx.fillText('대본과 말하기만 연습하는 중이에요 🎤', c.width / 2, c.height / 2 + 80);
   placeholder = c;

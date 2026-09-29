@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
+import { TOUCH_UI } from '../lib/device';
 import { look, scriptScroll } from '../runtime';
 import { useApp } from '../store';
 
 const SENSITIVITY = 0.0022;
+const TOUCH_SENSITIVITY = 0.0045;
 const YAW_LIMIT = Math.PI * 0.95;
 const PITCH_MIN = -1.0;
 const PITCH_MAX = 0.7;
@@ -12,6 +14,7 @@ const WHEEL_COOLDOWN_MS = 220;
 /**
  * Mouse and keyboard controls while presenting.
  * Left click toggles clicker mode, right click toggles script mode; the wheel acts on whichever is in hand.
+ * On touch devices dragging the canvas looks around instead, and the HUD provides the buttons.
  */
 export function usePresenterInput(canvas: HTMLCanvasElement | null) {
   useEffect(() => {
@@ -22,9 +25,24 @@ export function usePresenterInput(canvas: HTMLCanvasElement | null) {
 
     const locked = () => document.pointerLockElement === canvas;
 
-    const onLockChange = () => {
-      const paused = !locked();
-      app().set(!paused && app().startedAt === 0 ? { paused, startedAt: performance.now() } : { paused });
+    const onLockChange = () => (locked() ? app().resume() : app().pause());
+
+    // Drag to look, grabbing the world like a panorama viewer. Only one finger steers.
+    let drag: { id: number; x: number; y: number } | null = null;
+    const onPointerDown = (e: PointerEvent) => {
+      if (drag || app().paused) return;
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      canvas.setPointerCapture(e.pointerId);
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      if (drag?.id !== e.pointerId) return;
+      look.yaw = clamp(look.yaw + (e.clientX - drag.x) * TOUCH_SENSITIVITY, -YAW_LIMIT, YAW_LIMIT);
+      look.pitch = clamp(look.pitch + (e.clientY - drag.y) * TOUCH_SENSITIVITY, PITCH_MIN, PITCH_MAX);
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      if (drag?.id === e.pointerId) drag = null;
     };
 
     const onMouseMove = (e: MouseEvent) => {
@@ -91,8 +109,11 @@ export function usePresenterInput(canvas: HTMLCanvasElement | null) {
           app().toggleDistraction();
           break;
         case 'KeyR':
-          look.yaw = 0;
-          look.pitch = -0.08;
+          resetLook();
+          break;
+        case 'Escape':
+          if (!TOUCH_UI) return; // with pointer lock the browser handles Esc itself
+          app().pause();
           break;
         default:
           return;
@@ -102,6 +123,12 @@ export function usePresenterInput(canvas: HTMLCanvasElement | null) {
 
     const onContextMenu = (e: Event) => e.preventDefault();
 
+    if (TOUCH_UI) {
+      canvas.addEventListener('pointerdown', onPointerDown);
+      canvas.addEventListener('pointermove', onPointerMove);
+      canvas.addEventListener('pointerup', onPointerUp);
+      canvas.addEventListener('pointercancel', onPointerUp);
+    }
     document.addEventListener('pointerlockchange', onLockChange);
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mousedown', onMouseDown);
@@ -109,6 +136,10 @@ export function usePresenterInput(canvas: HTMLCanvasElement | null) {
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('contextmenu', onContextMenu);
     return () => {
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerUp);
       document.removeEventListener('pointerlockchange', onLockChange);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mousedown', onMouseDown);
@@ -120,10 +151,33 @@ export function usePresenterInput(canvas: HTMLCanvasElement | null) {
   }, [canvas]);
 }
 
-export function requestLock() {
+/** Enters the presenter view. `onFail` runs if the browser refuses the pointer lock. */
+export function requestLock(onFail: () => void) {
+  if (TOUCH_UI) {
+    useApp.getState().resume();
+    // Hide the browser bars where possible (not supported on iPhone).
+    document.documentElement.requestFullscreen?.().catch(() => {});
+    return;
+  }
   const canvas = document.querySelector<HTMLCanvasElement>('#sim canvas');
-  // Chrome rejects re-locking within ~1s of Esc; the overlay stays up so the user can just click again.
-  Promise.resolve(canvas?.requestPointerLock()).catch(() => {});
+  if (!canvas) return;
+  // Chrome rejects re-locking within ~1s of Esc; older browsers report it only via the event.
+  const done = () => {
+    document.removeEventListener('pointerlockerror', fail);
+    document.removeEventListener('pointerlockchange', done);
+  };
+  const fail = () => {
+    done();
+    onFail();
+  };
+  document.addEventListener('pointerlockerror', fail);
+  document.addEventListener('pointerlockchange', done);
+  Promise.resolve(canvas.requestPointerLock()).catch(fail);
+}
+
+export function resetLook() {
+  look.yaw = 0;
+  look.pitch = -0.08;
 }
 
 function clamp(v: number, min: number, max: number) {

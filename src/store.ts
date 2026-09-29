@@ -5,7 +5,6 @@ import type { VenueId } from './sim/venues';
 export const DEFAULT_PUNIS = Object.values(
   import.meta.glob<string>('./assets/punis/*.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' }),
 );
-export const FALLBACK_PUNI = `${import.meta.env.BASE_URL}puni.svg`;
 const randomSeed = () => Math.floor(Math.random() * 2 ** 31);
 
 export type HandMode = 'none' | 'clicker' | 'script';
@@ -36,6 +35,8 @@ interface AppState {
   set: (patch: Partial<AppState>) => void;
   start: () => void;
   exitToSetup: () => void;
+  resume: () => void;
+  pause: () => void;
   shuffleSeats: () => void;
   toggleDistraction: () => void;
   toggleMode: (mode: Exclude<HandMode, 'none'>) => void;
@@ -51,7 +52,7 @@ export const useApp = create<AppState>((set, get) => ({
   script: '',
   venue: 'classroom',
   puniCount: 20,
-  puniImages: DEFAULT_PUNIS.length ? DEFAULT_PUNIS : [FALLBACK_PUNI],
+  puniImages: DEFAULT_PUNIS,
   seatSeed: randomSeed(),
   distraction: false,
 
@@ -65,6 +66,8 @@ export const useApp = create<AppState>((set, get) => ({
   set: (patch) => set(patch),
   start: () => set({ screen: 'sim', slideIndex: 0, mode: 'none', paused: true, startedAt: 0, seatSeed: randomSeed() }),
   exitToSetup: () => set({ screen: 'setup', paused: true }),
+  resume: () => set({ paused: false, startedAt: get().startedAt || performance.now() }),
+  pause: () => set({ paused: true }),
   shuffleSeats: () => set({ seatSeed: randomSeed() }),
   toggleDistraction: () => set({ distraction: !get().distraction }),
   toggleMode: (mode) => set({ mode: get().mode === mode ? 'none' : mode }),

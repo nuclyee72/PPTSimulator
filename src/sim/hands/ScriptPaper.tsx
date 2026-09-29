@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { wrapText } from '../../lib/text';
-import { scriptScroll } from '../../runtime';
+import { scriptScroll, view } from '../../runtime';
 import { useApp } from '../../store';
 import { Box } from '../Boxes';
 
@@ -10,6 +10,10 @@ const PAPER_W = 0.23;
 const PAPER_H = PAPER_W * 1.414;
 const UP = new THREE.Vector3(-0.03, -0.085, -0.43);
 const DOWN = new THREE.Vector3(-0.1, -0.75, -0.4);
+const HOLD_DELAY_MS = 250; // a quick tap on a touch scroll button nudges; holding it scrolls continuously
+const HOLD_SPEED = 900; // px of script canvas per second
+const target = new THREE.Vector3();
+const down = new THREE.Vector3();
 
 const CW = 1024;
 const CH = Math.round(CW * 1.414);
@@ -112,10 +116,15 @@ export function ScriptPaper() {
     if (!g) return;
     const active = useApp.getState().mode === 'script';
     const k = 1 - Math.exp(-dt * 12);
-    g.position.lerp(active ? UP : DOWN, k);
-    g.rotation.set(-0.22 + (1 - Math.min(1, g.position.distanceTo(DOWN) / 0.3)) * -0.6, 0.06, 0.03);
-    g.visible = g.position.distanceTo(DOWN) > 0.02;
+    down.copy(DOWN).setX(DOWN.x * view.squeeze);
+    target.copy(active ? UP : DOWN).setX((active ? UP : DOWN).x * view.squeeze);
+    g.position.lerp(target, k);
+    g.rotation.set(-0.22 + (1 - Math.min(1, g.position.distanceTo(down) / 0.3)) * -0.6, 0.06, 0.03);
+    g.visible = g.position.distanceTo(down) > 0.02;
 
+    if (scriptScroll.hold && performance.now() - scriptScroll.holdSince > HOLD_DELAY_MS) {
+      scriptScroll.target += scriptScroll.hold * HOLD_SPEED * dt;
+    }
     scriptScroll.target = Math.min(Math.max(scriptScroll.target, 0), scriptScroll.max);
     scriptScroll.current += (scriptScroll.target - scriptScroll.current) * (1 - Math.exp(-dt * 14));
     if (g.visible && !(Math.abs(scriptScroll.current - drawnAt.current) < 0.5)) {

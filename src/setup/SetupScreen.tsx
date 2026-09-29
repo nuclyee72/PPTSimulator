@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { TOUCH_UI } from '../lib/device';
 import { loadPuniSprite, puniHeight, type PuniSprite } from '../lib/cutout';
 import { loadPdfSlides } from '../lib/pdf';
 import { readTextFile } from '../lib/text';
 import { VENUES, type VenueId } from '../sim/venues';
-import { DEFAULT_PUNIS, FALLBACK_PUNI, useApp } from '../store';
+import { DEFAULT_PUNIS, useApp } from '../store';
 
 // Usable area inside a Puni tile, in px (tile is 86×96 with 6px padding).
 const TILE_W = 74;
@@ -109,22 +110,20 @@ export function SetupScreen() {
   const addPunis = (files: File[]) => {
     const urls = files.filter((f) => f.type.startsWith('image/')).map((f) => URL.createObjectURL(f));
     if (!urls.length) return;
-    const kept = s.puniImages.filter((u) => u !== FALLBACK_PUNI);
-    s.set({ puniImages: [...kept, ...urls] });
+    s.set({ puniImages: [...s.puniImages, ...urls] });
   };
 
   const removePuni = (url: string) => {
-    const rest = s.puniImages.filter((u) => u !== url);
-    s.set({ puniImages: rest.length ? rest : [FALLBACK_PUNI] });
+    s.set({ puniImages: s.puniImages.filter((u) => u !== url) });
   };
 
-  const resetPunis = () => s.set({ puniImages: DEFAULT_PUNIS.length ? DEFAULT_PUNIS : [FALLBACK_PUNI] });
+  const resetPunis = () => s.set({ puniImages: DEFAULT_PUNIS });
 
   const pickVenue = (id: VenueId) => s.set({ venue: id, puniCount: Math.min(s.puniCount, VENUES[id].seats.length) });
 
   const loading = pdfProgress !== null;
   const scriptPreview = s.script.split(/\r?\n/).filter((l) => l.trim()).slice(0, 3);
-  const heroPuni = previews[s.puniImages[0]]?.preview ?? FALLBACK_PUNI;
+  const heroPuni = previews[s.puniImages[0]]?.preview;
 
   // Same size rule as in the 3D scene, scaled so the tallest and widest Puni still fit a tile.
   const loaded = s.puniImages.map((u) => previews[u]).filter(Boolean);
@@ -135,7 +134,7 @@ export function SetupScreen() {
   return (
     <div className="setup">
       <header className="hero">
-        <img src={heroPuni} alt="" className="hero-puni bob" />
+        {heroPuni ? <img src={heroPuni} alt="" className="hero-puni bob" /> : <span className="hero-puni" />}
         <div>
           <h1>발표 연습 시뮬레이터</h1>
           <p className="muted">푸니들 앞에서 미리 발표해 보세요!</p>
@@ -153,11 +152,11 @@ export function SetupScreen() {
                 <img src={s.slides[0].src} alt="첫 슬라이드" className="thumb" />
                 <div>
                   <b>{s.pdfName}</b>
-                  <p className="muted">{s.slides.length}장 ✓ · 클릭해서 바꾸기</p>
+                  <p className="muted">{s.slides.length}장 ✓ · {TOUCH_UI ? '탭' : '클릭'}해서 바꾸기</p>
                 </div>
               </div>
             ) : (
-              <p>📂 PDF를 끌어다 놓거나 클릭해서 선택<br /><small className="muted">PPT는 "내보내기 → PDF"로 저장해서 올려 주세요</small></p>
+              <p>📂 {TOUCH_UI ? 'PDF 파일을 탭해서 선택' : 'PDF를 끌어다 놓거나 클릭해서 선택'}<br /><small className="muted">PPT는 "내보내기 → PDF"로 저장해서 올려 주세요</small></p>
             )}
           </FileDrop>
         </section>
@@ -173,7 +172,7 @@ export function SetupScreen() {
                 ))}
               </div>
             ) : (
-              <p>📝 대본 .txt 파일을 끌어다 놓거나 클릭<br /><small className="muted"># 로 시작하는 줄은 제목처럼 강조돼요</small></p>
+              <p>📝 {TOUCH_UI ? '대본 .txt 파일을 탭해서 선택' : '대본 .txt 파일을 끌어다 놓거나 클릭'}<br /><small className="muted"># 로 시작하는 줄은 제목처럼 강조돼요</small></p>
             )}
           </FileDrop>
         </section>
@@ -215,7 +214,7 @@ export function SetupScreen() {
               <input type="checkbox" checked={s.distraction} onChange={s.toggleDistraction} />
               <span className="switch" />
               <span>
-                <b>😜 딴짓 모드</b> <small className="muted">일부 푸니가 발표자 대신 서로 쳐다보며 놀아요 (발표 중 D 키)</small>
+                <b>😜 딴짓 모드</b> <small className="muted">일부 푸니가 발표자 대신 서로 쳐다보며 놀아요 (발표 중 {TOUCH_UI ? '😜 버튼' : 'D 키'})</small>
               </span>
             </label>
           </div>
@@ -234,7 +233,7 @@ export function SetupScreen() {
                 ) : (
                   <div className="puni-loading">…</div>
                 )}
-                {url !== FALLBACK_PUNI && (
+                {s.puniImages.length > 1 && (
                   <button className="remove" title="빼기" onClick={() => removePuni(url)}>×</button>
                 )}
               </div>
