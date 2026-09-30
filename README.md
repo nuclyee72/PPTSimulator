@@ -1,54 +1,54 @@
-# 발표 연습 시뮬레이터
+# Presentation Practice Simulator
 
 👉 **https://nuclyee72.github.io/PPTSimulator/**
 
-푸니 관객 앞에서 발표를 연습하는 1인칭 3D 웹앱 (Vite + React + React Three Fiber).
+A first-person 3D web app for rehearsing a presentation in front of an audience of Punis (Vite + React + React Three Fiber).
 
 ```bash
 npm install
 npm run dev
 ```
 
-## 사용법
-1. 발표 자료 **PDF** 업로드 (선택, PowerPoint → 내보내기 → PDF. 없으면 스크린에 "발표 자료 없음" 표시)
-2. 대본 **.txt** 업로드 (선택, UTF-8/EUC-KR 모두 가능, `#`으로 시작하는 줄은 제목 강조)
-3. 장소 선택: 교실(30석) / 계단식 강의실(180석)
-4. 푸니 수 조절 → 입장
+## Usage
+1. Upload your slides as a **PDF** (optional; in PowerPoint use Export → PDF. Without one, the screen shows "No slides")
+2. Upload a script as **.txt** (optional; UTF-8 and EUC-KR both work, lines starting with `#` are highlighted as headings)
+3. Pick a venue: Classroom (30 seats) / Lecture Hall (180 seats)
+4. Set the audience size → enter
 
-## 조작
-| 입력 | 동작 |
+## Controls
+| Input | Action |
 |---|---|
-| 좌클릭 | 클리커 모드 (다시 누르면 내려놓기) → 휠 ↓/↑ 다음/이전 슬라이드 |
-| 우클릭 | 대본 모드 (다시 누르면 내려놓기) → 휠 대본 스크롤 |
-| 마우스 이동 | 둘러보기 (뒤돌면 큰 스크린) |
-| → / PageDown, ← / PageUp | 키보드·실제 발표 리모컨으로 넘기기 |
-| D | 딴짓 모드 켜기/끄기 (일부 푸니가 발표자 대신 옆 친구와 놀기) |
-| R / Esc | 시선 정면 / 일시정지 |
+| Left click | Clicker mode (click again to put it down) → wheel ↓/↑ next/previous slide |
+| Right click | Script mode (click again to put it down) → wheel scrolls the script |
+| Move mouse | Look around (turn around to see the big screen) |
+| → / PageDown, ← / PageUp | Change slides with the keyboard or a real presentation remote |
+| D | Toggle distraction mode (some Punis play with their neighbours instead of watching you) |
+| R / Esc | Look forward / pause |
 
-### 모바일 (휴대폰·태블릿)
-터치 기기에서는 자동으로 화면 버튼 모드가 됩니다. 가로 화면을 추천해요.
+### Mobile (phones & tablets)
+Touch devices automatically switch to on-screen buttons. Landscape is recommended.
 
-| 입력 | 동작 |
+| Input | Action |
 |---|---|
-| 화면 드래그 | 둘러보기 |
-| 🖊️ 클리커 → ◀ ▶ | 이전/다음 슬라이드 |
-| 📄 대본 → ▲ ▼ | 대본 스크롤 (꾹 누르면 계속) |
-| 😜 / 🎯 / ⏸ | 딴짓 모드 / 정면 보기 / 일시정지 |
+| Drag the screen | Look around |
+| 🖊️ Clicker → ◀ ▶ | Previous/next slide |
+| 📄 Script → ▲ ▼ | Scroll the script (hold to keep scrolling) |
+| 😜 / 🎯 / ⏸ | Distraction mode / look forward / pause |
 
-## 푸니 이미지
-`src/assets/punis/` 폴더의 이미지(png/jpg/webp)가 모두 푸니로 등장합니다. 파일을 넣기만 하면 자동으로 추가됩니다.
-흰 배경 사진은 브라우저에서 배경이 자동으로 지워지고, 투명 PNG도 그대로 쓸 수 있습니다. 설정 화면에서 추가/빼기도 가능합니다.
+## Puni images
+Every image (png/jpg/webp) in `src/assets/punis/` shows up as a Puni — just drop files in and they're added automatically.
+White backgrounds are removed in the browser, and transparent PNGs work as-is. You can also add or remove images on the setup screen.
 
-좌석과 캐릭터 배치는 입장할 때마다 랜덤이며, 일시정지 화면의 "🎲 자리 섞기"로 다시 섞을 수 있습니다.
+Seats and characters are randomized each time you enter; use "🎲 Shuffle seats" on the pause screen to reshuffle.
 
-## 구조
-- `src/setup/` 설정 화면
-- `src/sim/venues/` 장소 정의(좌석 좌표, 스크린·교탁 위치, 방 모델) — 새 장소는 여기에 추가 후 `index.ts`에 등록
-- `src/sim/Audience.tsx` 푸니 (캐릭터별 인스턴싱된 2D 스프라이트, 랜덤 배치)
-- `src/lib/cutout.ts` 흰 배경 제거
-- `src/sim/hands/` 1인칭 클리커·대본
-- `src/sim/usePresenterInput.ts` 입력 처리
+## Structure
+- `src/setup/` setup screen
+- `src/sim/venues/` venue definitions (seat positions, screen/podium placement, room model) — add a new venue here and register it in `index.ts`
+- `src/sim/Audience.tsx` Punis (instanced 2D sprites per character, random placement)
+- `src/lib/cutout.ts` white background removal
+- `src/sim/hands/` first-person clicker and script
+- `src/sim/usePresenterInput.ts` input handling
 
-## 저작권
-푸니 이미지(`src/assets/punis/`)의 저작권은 **NEXON Games**에 있습니다. © NEXON Games Co., Ltd. All Rights Reserved.
-이 프로젝트는 비상업적 팬 프로젝트이며 NEXON과 관련이 없습니다.
+## Copyright
+Puni images (`src/assets/punis/`) are copyrighted by **NEXON Games**. © NEXON Games Co., Ltd. All Rights Reserved.
+This project is a non-commercial fan project and is not affiliated with NEXON.

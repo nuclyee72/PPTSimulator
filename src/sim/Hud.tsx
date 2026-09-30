@@ -6,22 +6,22 @@ import { requestLock, resetLook } from './usePresenterInput';
 
 const HINTS = {
   none: [
-    ['좌클릭', '클리커 들기'],
-    ['우클릭', '대본 들기'],
+    ['Left click', 'Pick up clicker'],
+    ['Right click', 'Pick up script'],
   ],
   clicker: [
-    ['휠 ↓ / ↑', '다음 / 이전 슬라이드'],
-    ['좌클릭', '내려놓기'],
-    ['우클릭', '대본으로 바꾸기'],
+    ['Wheel ↓ / ↑', 'Next / previous slide'],
+    ['Left click', 'Put down'],
+    ['Right click', 'Switch to script'],
   ],
   script: [
-    ['휠', '대본 스크롤'],
-    ['우클릭', '내려놓기'],
-    ['좌클릭', '클리커로 바꾸기'],
+    ['Wheel', 'Scroll script'],
+    ['Right click', 'Put down'],
+    ['Left click', 'Switch to clicker'],
   ],
 } as const;
 
-const MODE_LABEL = { none: '🙌 빈손', clicker: '🖊️ 클리커', script: '📄 대본' } as const;
+const MODE_LABEL = { none: '🙌 Empty hands', clicker: '🖊️ Clicker', script: '📄 Script' } as const;
 const TAP_SCROLL = 90; // px of script canvas per tap on ▲ / ▼
 
 function useElapsed(startedAt: number) {
@@ -72,10 +72,10 @@ function TouchControls() {
           </div>
         )}
         <button className={`tbtn big ${mode === 'script' ? 'on' : ''}`} onClick={() => toggleMode('script')}>
-          📄<small>대본</small>
+          📄<small>Script</small>
         </button>
       </div>
-      {mode === 'none' && <div className="touch-hint chip">👆 화면을 드래그해서 둘러보기</div>}
+      {mode === 'none' && <div className="touch-hint chip">👆 Drag the screen to look around</div>}
       <div className="touch-side right">
         {mode === 'clicker' && (
           <div className="touch-pair row-pair">
@@ -84,7 +84,7 @@ function TouchControls() {
           </div>
         )}
         <button className={`tbtn big ${mode === 'clicker' ? 'on' : ''}`} onClick={() => toggleMode('clicker')}>
-          🖊️<small>클리커</small>
+          🖊️<small>Clicker</small>
         </button>
       </div>
     </>
@@ -113,10 +113,10 @@ export function Hud() {
           <span className="chip">
             {slides.length ? (
               <>
-                슬라이드 <b>{slideIndex + 1}</b> / {slides.length}
+                Slide <b>{slideIndex + 1}</b> / {slides.length}
               </>
             ) : (
-              '슬라이드 없음'
+              'No slides'
             )}
           </span>
           {TOUCH_UI && <span className="chip">⏱ {elapsed}</span>}
@@ -124,20 +124,20 @@ export function Hud() {
         {TOUCH_UI ? (
           !paused && (
             <span className="hud-right">
-              <button className={`tbtn small ${distraction ? 'on' : ''}`} onClick={toggleDistraction} title="딴짓 모드">
+              <button className={`tbtn small ${distraction ? 'on' : ''}`} onClick={toggleDistraction} title="Distraction mode">
                 😜
               </button>
-              <button className="tbtn small" onClick={resetLook} title="정면 보기">
+              <button className="tbtn small" onClick={resetLook} title="Look forward">
                 🎯
               </button>
-              <button className="tbtn small" onClick={pause} title="일시정지">
+              <button className="tbtn small" onClick={pause} title="Pause">
                 ⏸
               </button>
             </span>
           )
         ) : (
           <span className="hud-right">
-            {distraction && <span className="chip mode">😜 딴짓 ON</span>}
+            {distraction && <span className="chip mode">😜 Distraction ON</span>}
             <span className="chip">⏱ {elapsed}</span>
           </span>
         )}
@@ -160,44 +160,44 @@ export function Hud() {
       {paused && (
         <div className="overlay" onClick={enter}>
           <div className="card pause-card" onClick={(e) => e.stopPropagation()}>
-            <h2>발표 준비 완료!</h2>
+            <h2>Ready to present!</h2>
             {TOUCH_UI ? (
               <>
-                <p className="muted">시작 버튼을 누르면 발표자 시점으로 들어가요.</p>
+                <p className="muted">Press Start to step into the presenter's view.</p>
                 <ul className="controls">
-                  <li><kbd>👆 드래그</kbd> 둘러보기 (뒤돌면 큰 스크린이 보여요)</li>
-                  <li><kbd>🖊️ 클리커</kbd> 들고 <kbd>◀ ▶</kbd> 이전 / 다음 슬라이드</li>
-                  <li><kbd>📄 대본</kbd> 들고 <kbd>▲ ▼</kbd> 대본 스크롤 (꾹 누르면 계속)</li>
-                  <li><kbd>😜</kbd> 딴짓 모드 · <kbd>🎯</kbd> 정면 보기 · <kbd>⏸</kbd> 일시정지</li>
+                  <li><kbd>👆 Drag</kbd> Look around (turn around to see the big screen)</li>
+                  <li><kbd>🖊️ Clicker</kbd> then <kbd>◀ ▶</kbd> Previous / next slide</li>
+                  <li><kbd>📄 Script</kbd> then <kbd>▲ ▼</kbd> Scroll script (hold to keep scrolling)</li>
+                  <li><kbd>😜</kbd> Distraction mode · <kbd>🎯</kbd> Look forward · <kbd>⏸</kbd> Pause</li>
                 </ul>
-                <p className="muted note portrait-only">📱 가로로 돌리면 더 넓게 보여요</p>
+                <p className="muted note portrait-only">📱 Rotate to landscape for a wider view</p>
               </>
             ) : (
               <>
-                <p className="muted">화면을 클릭하면 발표자 시점으로 들어가요.</p>
+                <p className="muted">Click the screen to step into the presenter's view.</p>
                 <ul className="controls">
-                  <li><kbd>마우스 이동</kbd> 둘러보기 (뒤돌면 큰 스크린이 보여요)</li>
-                  <li><kbd>좌클릭</kbd> 클리커 들기 → <kbd>휠</kbd> 이전 / 다음 슬라이드</li>
-                  <li><kbd>우클릭</kbd> 대본 들기 → <kbd>휠</kbd> 대본 스크롤</li>
-                  <li><kbd>→ / PageDown</kbd> <kbd>← / PageUp</kbd> 키보드·리모컨으로 넘기기</li>
-                  <li><kbd>D</kbd> 딴짓 모드 켜기/끄기</li>
-                  <li><kbd>R</kbd> 시선 정면으로 · <kbd>Esc</kbd> 일시정지</li>
+                  <li><kbd>Move mouse</kbd> Look around (turn around to see the big screen)</li>
+                  <li><kbd>Left click</kbd> Pick up clicker → <kbd>Wheel</kbd> Previous / next slide</li>
+                  <li><kbd>Right click</kbd> Pick up script → <kbd>Wheel</kbd> Scroll script</li>
+                  <li><kbd>→ / PageDown</kbd> <kbd>← / PageUp</kbd> Change slides with keyboard or remote</li>
+                  <li><kbd>D</kbd> Toggle distraction mode</li>
+                  <li><kbd>R</kbd> Look forward · <kbd>Esc</kbd> Pause</li>
                 </ul>
               </>
             )}
-            {lockFailed && <p className="error lock-error">앗, 브라우저가 잠깐 막았어요. 1초 뒤에 다시 눌러 주세요!</p>}
+            {lockFailed && <p className="error lock-error">Oops, the browser blocked that for a moment. Try again in a second!</p>}
             <div className="row">
               <button className="btn ghost" onClick={leave}>
-                ← 설정으로
+                ← Back to setup
               </button>
               <button className="btn ghost" onClick={shuffleSeats}>
-                🎲 자리 섞기
+                🎲 Shuffle seats
               </button>
               <button className={`btn ${distraction ? 'active' : 'ghost'}`} onClick={toggleDistraction}>
-                😜 딴짓 {distraction ? 'ON' : 'OFF'}
+                😜 Distraction {distraction ? 'ON' : 'OFF'}
               </button>
               <button className="btn primary" onClick={enter}>
-                {startedAt ? '계속하기 ▶' : '발표 시작 🎤'}
+                {startedAt ? 'Resume ▶' : 'Start 🎤'}
               </button>
             </div>
           </div>

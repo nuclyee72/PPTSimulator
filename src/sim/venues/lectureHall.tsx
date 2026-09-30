@@ -117,9 +117,9 @@ function Room() {
 
 export const lectureHall: VenueDef = {
   id: 'lectureHall',
-  name: '계단식 강의실',
+  name: 'Lecture Hall',
   emoji: '🎓',
-  description: `넓은 강의실 · 최대 ${seatsRaw.length}석`,
+  description: `Tiered lecture hall · up to ${seatsRaw.length} seats`,
   presenter: [-2.2, 1.6, 1.4],
   seats: seatsRaw.map((s) => s.p),
   screen: { center: [1.6, 3.4, FRONT - 0.15], width: 6.2, rotY: Math.PI, projector: [1.6, H - 0.6, -5] },

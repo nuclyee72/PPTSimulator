@@ -24,7 +24,7 @@ const FONT_PX = 40;
 const LINE_H = 64;
 const FONT_FAMILY = '"Gowun Dodum", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
 
-/** A line like "# 2. 문제 제기" or "[슬라이드 3]" is drawn as a highlighted heading. */
+/** A line like "# 2. The problem" or "[Slide 3]" is drawn as a highlighted heading. */
 const isHeading = (line: string) => /^\s*#/.test(line) || /^\s*\[.*\]\s*$/.test(line);
 
 /** Script on a clipboard held in the left hand; the text is drawn to a canvas and re-drawn as it scrolls. */
@@ -52,7 +52,7 @@ export function ScriptPaper() {
 
   const lines = useMemo(() => {
     ctx.font = `${FONT_PX}px ${FONT_FAMILY}`;
-    const text = script.trim() ? script : '대본 파일을 올리지 않았어요.\n\n설정 화면에서 .txt 대본을 추가하면 여기에 표시됩니다.';
+    const text = script.trim() ? script : 'No script uploaded.\n\nAdd a .txt script on the setup screen and it will show up here.';
     return wrapText(ctx, text, CW - MARGIN_X - 70);
   }, [script, ctx, fontsReady]);
 
@@ -94,7 +94,7 @@ export function ScriptPaper() {
     // Header
     ctx.font = `bold 34px ${FONT_FAMILY}`;
     ctx.fillStyle = '#9d8189';
-    ctx.fillText(`📄 ${scriptName || '대본'}`, 48, 104);
+    ctx.fillText(`📄 ${scriptName || 'Script'}`, 48, 104);
     ctx.fillStyle = '#f1e3d3';
     ctx.fillRect(40, 124, CW - 80, 3);
 

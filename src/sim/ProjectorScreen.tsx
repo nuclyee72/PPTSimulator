@@ -23,10 +23,10 @@ function placeholderSlide() {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#3d3129';
   ctx.font = '96px Jua, "Malgun Gothic", sans-serif';
-  ctx.fillText('발표 자료 없음', c.width / 2, c.height / 2);
+  ctx.fillText('No slides', c.width / 2, c.height / 2);
   ctx.fillStyle = '#857361';
   ctx.font = '40px "Gowun Dodum", "Malgun Gothic", sans-serif';
-  ctx.fillText('대본과 말하기만 연습하는 중이에요 🎤', c.width / 2, c.height / 2 + 80);
+  ctx.fillText('Just practicing the script and delivery 🎤', c.width / 2, c.height / 2 + 80);
   placeholder = c;
   return c;
 }

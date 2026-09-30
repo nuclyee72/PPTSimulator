@@ -130,9 +130,9 @@ function Room() {
 
 export const classroom: VenueDef = {
   id: 'classroom',
-  name: '교실',
+  name: 'Classroom',
   emoji: '🏫',
-  description: '아담한 교실 · 최대 30석',
+  description: 'Cozy classroom · up to 30 seats',
   presenter: [-0.2, 1.6, 1.3],
   seats: seatsRaw.map((s) => s.p),
   screen: { center: [1.9, 1.85, FRONT - 0.2], width: 3.0, rotY: Math.PI, projector: [1.9, H - 0.35, -1.5] },

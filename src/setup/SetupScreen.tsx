@@ -85,7 +85,7 @@ export function SetupScreen() {
 
   const onPdf = async ([file]: File[]) => {
     if (!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf') {
-      setError('PDF 파일만 올릴 수 있어요. PowerPoint에서 "내보내기 → PDF"로 저장해 주세요.');
+      setError('Only PDF files are supported. In PowerPoint, save via "Export → PDF".');
       return;
     }
     setError('');
@@ -96,7 +96,7 @@ export function SetupScreen() {
       s.set({ slides: images, slideAspect: aspect, pdfName: file.name });
     } catch (e) {
       console.error(e);
-      setError('PDF를 읽지 못했어요. 파일이 손상되었거나 암호가 걸려 있는지 확인해 주세요.');
+      setError("Couldn't read the PDF. Check that the file isn't corrupted or password-protected.");
     } finally {
       setPdfProgress(null);
     }
@@ -136,33 +136,33 @@ export function SetupScreen() {
       <header className="hero">
         {heroPuni ? <img src={heroPuni} alt="" className="hero-puni bob" /> : <span className="hero-puni" />}
         <div>
-          <h1>발표 연습 시뮬레이터</h1>
-          <p className="muted">푸니들 앞에서 미리 발표해 보세요!</p>
+          <h1>Presentation Practice Simulator</h1>
+          <p className="muted">Rehearse your talk in front of the Punis!</p>
         </div>
       </header>
 
       <div className="grid">
         <section className="card">
-          <h3><span className="num">1</span> 발표 자료 (PDF) <small className="muted">선택</small></h3>
+          <h3><span className="num">1</span> Slides (PDF) <small className="muted">optional</small></h3>
           <FileDrop accept="application/pdf,.pdf" onFiles={onPdf}>
             {loading ? (
-              <p>슬라이드 준비 중… {pdfProgress[1] ? `${pdfProgress[0]} / ${pdfProgress[1]}` : ''}</p>
+              <p>Preparing slides… {pdfProgress[1] ? `${pdfProgress[0]} / ${pdfProgress[1]}` : ''}</p>
             ) : s.slides.length ? (
               <div className="loaded">
-                <img src={s.slides[0].src} alt="첫 슬라이드" className="thumb" />
+                <img src={s.slides[0].src} alt="First slide" className="thumb" />
                 <div>
                   <b>{s.pdfName}</b>
-                  <p className="muted">{s.slides.length}장 ✓ · {TOUCH_UI ? '탭' : '클릭'}해서 바꾸기</p>
+                  <p className="muted">{s.slides.length} {s.slides.length === 1 ? 'slide' : 'slides'} ✓ · {TOUCH_UI ? 'Tap' : 'Click'} to replace</p>
                 </div>
               </div>
             ) : (
-              <p>📂 {TOUCH_UI ? 'PDF 파일을 탭해서 선택' : 'PDF를 끌어다 놓거나 클릭해서 선택'}<br /><small className="muted">PPT는 "내보내기 → PDF"로 저장해서 올려 주세요</small></p>
+              <p>📂 {TOUCH_UI ? 'Tap to choose a PDF' : 'Drop a PDF here or click to choose'}<br /><small className="muted">For PowerPoint files, save via "Export → PDF" first</small></p>
             )}
           </FileDrop>
         </section>
 
         <section className="card">
-          <h3><span className="num">2</span> 대본 (TXT) <small className="muted">선택</small></h3>
+          <h3><span className="num">2</span> Script (TXT) <small className="muted">optional</small></h3>
           <FileDrop accept=".txt,text/plain" onFiles={onScript}>
             {s.script ? (
               <div className="script-preview">
@@ -172,13 +172,13 @@ export function SetupScreen() {
                 ))}
               </div>
             ) : (
-              <p>📝 {TOUCH_UI ? '대본 .txt 파일을 탭해서 선택' : '대본 .txt 파일을 끌어다 놓거나 클릭'}<br /><small className="muted"># 로 시작하는 줄은 제목처럼 강조돼요</small></p>
+              <p>📝 {TOUCH_UI ? 'Tap to choose a .txt script' : 'Drop a .txt script here or click to choose'}<br /><small className="muted">Lines starting with # are highlighted as headings</small></p>
             )}
           </FileDrop>
         </section>
 
         <section className="card">
-          <h3><span className="num">3</span> 발표 장소</h3>
+          <h3><span className="num">3</span> Venue</h3>
           <div className="venues">
             {(Object.keys(VENUES) as VenueId[]).map((id) => (
               <button key={id} className={`venue ${s.venue === id ? 'selected' : ''}`} onClick={() => pickVenue(id)}>
@@ -191,10 +191,10 @@ export function SetupScreen() {
         </section>
 
         <section className="card">
-          <h3><span className="num">4</span> 관객 수</h3>
+          <h3><span className="num">4</span> Audience size</h3>
           <div className="slider">
             <div className="count">
-              <b>{s.puniCount}</b>명 <small className="muted">/ {maxSeats}석 · 자리는 입장할 때마다 랜덤</small>
+              <b>{s.puniCount}</b> <small className="muted">/ {maxSeats} seats · seating is random each time you enter</small>
             </div>
             <input
               type="range"
@@ -206,7 +206,7 @@ export function SetupScreen() {
             <div className="presets">
               {[0, 0.25, 0.5, 1].map((r) => (
                 <button key={r} className="btn tiny" onClick={() => s.set({ puniCount: Math.round(maxSeats * r) })}>
-                  {r === 0 ? '텅 빈' : r === 1 ? '만석' : `${r * 100}%`}
+                  {r === 0 ? 'Empty' : r === 1 ? 'Full' : `${r * 100}%`}
                 </button>
               ))}
             </div>
@@ -214,7 +214,7 @@ export function SetupScreen() {
               <input type="checkbox" checked={s.distraction} onChange={s.toggleDistraction} />
               <span className="switch" />
               <span>
-                <b>😜 딴짓 모드</b> <small className="muted">일부 푸니가 발표자 대신 서로 쳐다보며 놀아요 (발표 중 {TOUCH_UI ? '😜 버튼' : 'D 키'})</small>
+                <b>😜 Distraction mode</b> <small className="muted">Some Punis goof off and look at each other instead of you ({TOUCH_UI ? '😜 button' : 'D key'} during the talk)</small>
               </span>
             </label>
           </div>
@@ -222,8 +222,8 @@ export function SetupScreen() {
 
         <section className="card wide">
           <h3>
-            <span className="num">5</span> 푸니 친구들 <small className="muted">{s.puniImages.length}종 · 섞여서 앉아요</small>
-            <button className="btn tiny push-right" onClick={resetPunis}>기본으로</button>
+            <span className="num">5</span> Puni friends <small className="muted">{s.puniImages.length} {s.puniImages.length === 1 ? 'kind' : 'kinds'} · seated mixed together</small>
+            <button className="btn tiny push-right" onClick={resetPunis}>Reset</button>
           </h3>
           <div className="puni-list">
             {s.puniImages.map((url) => (
@@ -234,28 +234,28 @@ export function SetupScreen() {
                   <div className="puni-loading">…</div>
                 )}
                 {s.puniImages.length > 1 && (
-                  <button className="remove" title="빼기" onClick={() => removePuni(url)}>×</button>
+                  <button className="remove" title="Remove" onClick={() => removePuni(url)}>×</button>
                 )}
               </div>
             ))}
             <FileDrop accept="image/*" multiple onFiles={addPunis} className="puni-add">
               <span className="plus">＋</span>
-              <small className="muted">이미지 추가</small>
+              <small className="muted">Add image</small>
             </FileDrop>
           </div>
-          <p className="muted note">흰 배경 사진은 배경이 자동으로 지워져요. 투명 PNG도 좋아요.</p>
+          <p className="muted note">White backgrounds are removed automatically. Transparent PNGs work too.</p>
         </section>
       </div>
 
       {error && <p className="error">{error}</p>}
 
       <button className="btn primary big" disabled={loading} onClick={s.start}>
-        발표장으로 입장 🎤
+        Enter the stage 🎤
       </button>
 
       <footer className="copyright">
-        푸니 이미지의 저작권은 NEXON Games에 있습니다. © NEXON Games Co., Ltd. All Rights Reserved.
-        <br />이 사이트는 비상업적 팬 프로젝트이며 NEXON과 관련이 없습니다.
+        Puni images are copyrighted by NEXON Games. © NEXON Games Co., Ltd. All Rights Reserved.
+        <br />This site is a non-commercial fan project and is not affiliated with NEXON.
       </footer>
     </div>
   );
